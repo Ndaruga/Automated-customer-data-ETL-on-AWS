@@ -1,0 +1,40 @@
+{
+  "name" : "csv-parquet",
+  "description" : "convert csv to patquet after performing few data transformation",
+  "role" : "arn:aws:iam::207034355228:role/service-role/AWSGlueServiceRole-V1",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-207034355228-us-east-2/scripts/csv-parquet.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--extra-py-files" : "s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_common.py,s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_split.py,s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_array_to_cols.py",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-207034355228-us-east-2/sparkHistoryLogs/",
+    "--enable-job-insights" : "false",
+    "--enable-glue-datacatalog" : "true",
+    "--enable-continuous-cloudwatch-log" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--job-language" : "python",
+    "--TempDir" : "s3://aws-glue-assets-207034355228-us-east-2/temporary/"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 10,
+  "timeout" : 2880,
+  "maxCapacity" : 10.0,
+  "glueVersion" : "4.0",
+  "numberOfWorkers" : 10,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "codeGenConfigurationNodes" : "{\"node-1687911691985\":{\"DynamicTransform\":{\"FunctionName\":\"gs_split\",\"Inputs\":[\"node-2\"],\"Name\":\"Split String\",\"Parameters\":[{\"IsOptional\":false,\"Name\":\"colName\",\"Type\":\"str\",\"Value\":[\"ModifiedDate\"]},{\"IsOptional\":false,\"Name\":\"pattern\",\"Type\":\"str\",\"Value\":[\"'\\\\s+'\"]},{\"IsOptional\":true,\"Name\":\"newColName\",\"Type\":\"str\",\"Value\":[\"Time\"]}],\"Path\":\"s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_split.py\",\"TransformName\":\"gs_split\",\"Version\":\"1.0.0\"}},\"node-1\":{\"S3CsvSource\":{\"AdditionalOptions\":{\"EnableSamplePath\":false,\"SamplePath\":\"s3://business-etl-pipeline/data/customer_database/customer_csv_files/customer.csv\"},\"Escaper\":\"\",\"Exclusions\":[],\"Name\":\"S3 bucket\",\"OptimizePerformance\":false,\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"CustomerID\",\"Type\":\"string\"},{\"Name\":\"NameStyle\",\"Type\":\"string\"},{\"Name\":\"Title\",\"Type\":\"string\"},{\"Name\":\"FirstName\",\"Type\":\"string\"},{\"Name\":\"MiddleName\",\"Type\":\"string\"},{\"Name\":\"LastName\",\"Type\":\"string\"},{\"Name\":\"Suffix\",\"Type\":\"string\"},{\"Name\":\"CompanyName\",\"Type\":\"string\"},{\"Name\":\"SalesPerson\",\"Type\":\"string\"},{\"Name\":\"EmailAddress\",\"Type\":\"string\"},{\"Name\":\"Phone\",\"Type\":\"string\"},{\"Name\":\"PasswordHash\",\"Type\":\"string\"},{\"Name\":\"PasswordSalt\",\"Type\":\"string\"},{\"Name\":\"rowguid\",\"Type\":\"string\"},{\"Name\":\"ModifiedDate\",\"Type\":\"string\"}]}],\"Paths\":[\"s3://business-etl-pipeline/data/customer_database/customer_csv_files/customer.csv\"],\"QuoteChar\":\"quote\",\"Recurse\":true,\"Separator\":\"comma\",\"WithHeader\":true}},\"node-2\":{\"ApplyMapping\":{\"Inputs\":[\"node-1\"],\"Mapping\":[{\"Dropped\":false,\"FromPath\":[\"CustomerID\"],\"FromType\":\"string\",\"ToKey\":\"CustomerID\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"NameStyle\"],\"FromType\":\"string\",\"ToKey\":\"NameStyle\",\"ToType\":\"string\"},{\"Dropped\":true,\"FromPath\":[\"Title\"],\"FromType\":\"string\",\"ToKey\":\"Title\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"FirstName\"],\"FromType\":\"string\",\"ToKey\":\"FirstName\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"MiddleName\"],\"FromType\":\"string\",\"ToKey\":\"MiddleName\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"LastName\"],\"FromType\":\"string\",\"ToKey\":\"LastName\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"Suffix\"],\"FromType\":\"string\",\"ToKey\":\"Suffix\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"CompanyName\"],\"FromType\":\"string\",\"ToKey\":\"CompanyName\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"SalesPerson\"],\"FromType\":\"string\",\"ToKey\":\"SalesPerson\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"EmailAddress\"],\"FromType\":\"string\",\"ToKey\":\"EmailAddress\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"Phone\"],\"FromType\":\"string\",\"ToKey\":\"Phone\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"PasswordHash\"],\"FromType\":\"string\",\"ToKey\":\"PasswordHash\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"PasswordSalt\"],\"FromType\":\"string\",\"ToKey\":\"PasswordSalt\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"rowguid\"],\"FromType\":\"string\",\"ToKey\":\"rowguid\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"ModifiedDate\"],\"FromType\":\"string\",\"ToKey\":\"ModifiedDate\",\"ToType\":\"string\"}],\"Name\":\"ApplyMapping\"}},\"node-3\":{\"S3GlueParquetTarget\":{\"Compression\":\"uncompressed\",\"Inputs\":[\"node-1687912486892\"],\"Name\":\"S3 bucket\",\"PartitionKeys\":[],\"Path\":\"s3://business-etl-pipeline/data/customer_database/customer_parquet_files/\",\"SchemaChangePolicy\":{\"EnableUpdateCatalog\":false}}},\"node-1687912486892\":{\"DynamicTransform\":{\"FunctionName\":\"gs_array_to_cols\",\"Inputs\":[\"node-1687911691985\"],\"Name\":\"Array To Columns\",\"Parameters\":[{\"IsOptional\":false,\"Name\":\"colName\",\"Type\":\"str\",\"Value\":[\"ModifiedDate\"]},{\"IsOptional\":false,\"Name\":\"colList\",\"Type\":\"str\",\"Value\":[\"Time\"]}],\"Path\":\"s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_array_to_cols.py\",\"TransformName\":\"gs_array_to_cols\",\"Version\":\"1.0.0\"}}}",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "Automated-customer-data-ETL-on-AWS",
+    "branch" : "main",
+    "folder" : "AWS Glue Jobs"
+  }
+}
